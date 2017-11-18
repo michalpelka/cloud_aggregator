@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<launch>
+
+
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="tf_virtual_laser" args="0 0 1.5 0 0 0 base_link virtual_scanner"/>
+  <node pkg="cloud_aggregator" type="aggregate_node" name="aggregate_node" args="">
+      <remap from="/input" to="/m3d_test/velodyne_points"/>
+      <param name="targetFrame" value="virtual_scanner"/>
+      <param name="aggregateNumber" value="25"/>
+
+  </node>
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" args="">
+    <remap from="/cloud_in" to="/aggregate_node/output"/>
+    <param name="min_height" value="-0.25"/>
+    <param name="max_height" value="0.25"/>
+    <param name="range_max" value="35"/>
+    <param name="angle_min" value="-3.14"/>
+    <param name="angle_max" value="3.14"/>
+    
+
+  </node>
+
+
+</launch>
