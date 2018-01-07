@@ -24,9 +24,11 @@ public:
 
 		nh.getParam("targetFrame", targetFrame);
 		nh.getParam("aggregateNumber", aggregateNumber);
+		seq =0;		
 		cloud_sub= nh.subscribe<PointCloud>("/input", 5, &aggregator_node::callback, this);
 		cloud_pub= nh.advertise<PointCloud>("output", 1);
 		ros::spin();
+		
 	}
 
 
@@ -41,6 +43,7 @@ private:
 	std::deque<PointCloud::Ptr> clouds;
 	int aggregateNumber;
 	std::string targetFrame;
+	int seq;
 
 };
 
@@ -103,6 +106,8 @@ void aggregator_node::callback(const PointCloud::ConstPtr& msg)
 			clouds.pop_front();
 		}
 		cloud_to_pub.header.frame_id=targetFrame;
+		cloud_to_pub.header.seq = seq;
+		seq ++;
 		pcl::transformPointCloud(cloud_to_pub, cloud_to_pub, transformOdomBaseLinkEigen.cast<float>());
 		cloud_pub.publish(cloud_to_pub);
 
